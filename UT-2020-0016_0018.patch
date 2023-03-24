@@ -1,0 +1,106 @@
+From 160ba75714e972556b8e7a4992c2ebd57df468c0 Mon Sep 17 00:00:00 2001
+From: liuminghang <liuminghang@uniontech.com>
+Date: Wed, 23 Dec 2020 14:17:33 +0800
+Subject: [PATCH] UT-2020-0016_0018
+
+Change-Id: I0c1b3eda3b53551b1340a7dd5c60bbd4de88590e
+---
+ Source/FreeImage/PluginTARGA.cpp | 33 +++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
+
+diff --git a/Source/FreeImage/PluginTARGA.cpp b/Source/FreeImage/PluginTARGA.cpp
+index 9e0f610..538d6e3 100644
+--- a/Source/FreeImage/PluginTARGA.cpp
++++ b/Source/FreeImage/PluginTARGA.cpp
+@@ -569,7 +569,7 @@ _assignPixel<32>(BYTE* bits, BYTE* val, BOOL as24bit) {
+ Generic RLE loader
+ */
+ template<int bPP>
+-static void 
++static bool 
+ loadRLE(FIBITMAP* dib, int width, int height, FreeImageIO* io, fi_handle handle, long eof, BOOL as24bit) {
+ 	const int file_pixel_size = bPP/8;
+ 	const int pixel_size = as24bit ? 3 : file_pixel_size;
+@@ -593,9 +593,7 @@ loadRLE(FIBITMAP* dib, int width, int height, FreeImageIO* io, fi_handle handle,
+ 	// ...and allocate cache of this size (yields good results)
+ 	IOCache cache(io, handle, sz);
+ 	if(cache.isNull()) {
+-		FreeImage_Unload(dib);
+-		dib = NULL;
+-		return;
++		return FALSE;
+ 	}
+ 		
+ 	int x = 0, y = 0;
+@@ -616,7 +614,7 @@ loadRLE(FIBITMAP* dib, int width, int height, FreeImageIO* io, fi_handle handle,
+ 		if ((line_bits+x) + packet_count*pixel_size > dib_end) {
+ 			FreeImage_OutputMessageProc(s_format_id, FI_MSG_ERROR_CORRUPTED);
+ 			// return what is left from the bitmap
+-			return;
++			return FALSE;
+ 		}
+ 
+ 		if (has_rle) {
+@@ -655,6 +653,7 @@ loadRLE(FIBITMAP* dib, int width, int height, FreeImageIO* io, fi_handle handle,
+ 		} //< has_rle
+ 
+ 	} //< while height
++	return TRUE;
+ 
+ }
+ 
+@@ -858,7 +857,11 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
+ 
+ 					case TGA_RLECMAP:
+ 					case TGA_RLEMONO: { //(8 bit)
+-						loadRLE<8>(dib, header.is_width, header.is_height, io, handle, eof, FALSE);
++						if (!loadRLE<8>(dib, header.is_width, header.is_height, io, handle, eof, FALSE)){
++							FreeImage_Unload(dib);
++							dib = NULL;
++							return NULL;
++						}
+ 					}
+ 					break;
+ 
+@@ -957,7 +960,11 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
+ 					break;
+ 
+ 					case TGA_RLERGB: { //(16 bit)
+-						loadRLE<16>(dib, header.is_width, header.is_height, io, handle, eof, TARGA_LOAD_RGB888 & flags);
++						if (!loadRLE<16>(dib, header.is_width, header.is_height, io, handle, eof, TARGA_LOAD_RGB888 & flags)){
++							FreeImage_Unload(dib);
++							dib = NULL;
++							return NULL;
++						}
+ 					}
+ 					break;
+ 
+@@ -996,7 +1003,11 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
+ 					break;
+ 
+ 					case TGA_RLERGB: { //(24 bit)
+-						loadRLE<24>(dib, header.is_width, header.is_height, io, handle, eof, TRUE);
++						if (!loadRLE<24>(dib, header.is_width, header.is_height, io, handle, eof, TRUE)) {
++							FreeImage_Unload(dib);
++							dib = NULL;
++							return NULL;
++						}
+ 					}
+ 					break;
+ 
+@@ -1047,7 +1058,11 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
+ 					break;
+ 
+ 					case TGA_RLERGB: { //(32 bit)
+-						loadRLE<32>(dib, header.is_width, header.is_height, io, handle, eof, TARGA_LOAD_RGB888 & flags);
++						if (!loadRLE<32>(dib, header.is_width, header.is_height, io, handle, eof, TARGA_LOAD_RGB888 & flags)) {
++							FreeImage_Unload(dib);
++							dib = NULL;
++							return NULL;
++						};
+ 					}
+ 					break;
+ 
+-- 
+2.20.1
+

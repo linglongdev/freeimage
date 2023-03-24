@@ -1,0 +1,137 @@
+From 45965f8ecb865849cd4e94bf791ea48001a73bff Mon Sep 17 00:00:00 2001
+From: Zhang Yong <zhangyong@uniontech.com>
+Date: Tue, 2 Feb 2021 19:18:32 +0800
+Subject: [PATCH] fix: UT-2021-0001
+
+UT-2021-0001
+
+Log: UT-2021-0001
+Bug: https://pms.uniontech.com/zentao/bug-view-60260.html
+Change-Id: I5752d00b7329210440cf9ef37d1475f76a56dd7e
+---
+ Source/FreeImageToolkit/CopyPaste.cpp | 60 +++++++++++++++++++++++----
+ 1 file changed, 51 insertions(+), 9 deletions(-)
+
+diff --git a/Source/FreeImageToolkit/CopyPaste.cpp b/Source/FreeImageToolkit/CopyPaste.cpp
+index d05a5df..de64069 100644
+--- a/Source/FreeImageToolkit/CopyPaste.cpp
++++ b/Source/FreeImageToolkit/CopyPaste.cpp
+@@ -3,7 +3,7 @@
+ //
+ // - Floris van den Berg (flvdberg@wxs.nl)
+ // - Alexander Dymerets (sashad@te.net.ua)
+-// - Hervé Drolon (drolon@infonie.fr)
++// - Hervï¿½ Drolon (drolon@infonie.fr)
+ // - Manfred Tausch (manfred.tausch@t-online.de)
+ // - Riley McNiff (rmcniff@marexgroup.com)
+ // - Carsten Klein (cklein05@users.sourceforge.net)
+@@ -135,8 +135,14 @@ Combine4(FIBITMAP *dst_dib, FIBITMAP *src_dib, unsigned x, unsigned y, unsigned
+ 			}
+ 		}
+ 	}
+-
+-	BYTE *dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) *	FreeImage_GetPitch(dst_dib)) + (x >> 1);
++	BYTE *dst_bits = nullptr;
++	long long result = ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) *	FreeImage_GetPitch(dst_dib));
++	if (UINT_MAX >= result) {
++		dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) *	FreeImage_GetPitch(dst_dib)) + (x >> 1);
++	} else {
++		dst_bits = FreeImage_GetBits(dst_dib);
++	}
++	
+ 	BYTE *src_bits = FreeImage_GetBits(src_dib);    
+ 
+ 	// combine images
+@@ -205,7 +211,13 @@ Combine8(FIBITMAP *dst_dib, FIBITMAP *src_dib, unsigned x, unsigned y, unsigned
+ 		return FALSE;
+ 	}
+ 
+-	BYTE *dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x);
++	BYTE *dst_bits = nullptr;
++	long long result = ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) *	FreeImage_GetPitch(dst_dib));
++	if (UINT_MAX >= result) {
++		dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x);
++	} else {
++		dst_bits = FreeImage_GetBits(dst_dib);
++	}
+ 	BYTE *src_bits = FreeImage_GetBits(src_dib);	
+ 
+ 	if(alpha > 255) {
+@@ -247,7 +259,13 @@ Combine16_555(FIBITMAP *dst_dib, FIBITMAP *src_dib, unsigned x, unsigned y, unsi
+ 		return FALSE;
+ 	}
+ 
+-	BYTE *dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x * 2);
++	BYTE *dst_bits = nullptr;
++	long long result = ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) *	FreeImage_GetPitch(dst_dib));
++	if (UINT_MAX >= result) {
++		dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x * 2);
++	} else {
++		dst_bits = FreeImage_GetBits(dst_dib);
++	}
+ 	BYTE *src_bits = FreeImage_GetBits(src_dib);	
+ 
+ 	if (alpha > 255) {
+@@ -307,7 +325,13 @@ Combine16_565(FIBITMAP *dst_dib, FIBITMAP *src_dib, unsigned x, unsigned y, unsi
+ 		return FALSE;
+ 	}
+ 
+-	BYTE *dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x * 2);
++	BYTE *dst_bits = nullptr;
++	long long result = ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) *	FreeImage_GetPitch(dst_dib));
++	if (UINT_MAX >= result) {
++		dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x * 2);
++	} else {
++		dst_bits = FreeImage_GetBits(dst_dib);
++	}
+ 	BYTE *src_bits = FreeImage_GetBits(src_dib);	
+ 
+ 	if (alpha > 255) {
+@@ -371,7 +395,13 @@ Combine24(FIBITMAP *dst_dib, FIBITMAP *src_dib, unsigned x, unsigned y, unsigned
+ 		return FALSE;
+ 	}
+ 
+-	BYTE *dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x * 3);
++	BYTE *dst_bits = nullptr;
++	long long result = ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) *	FreeImage_GetPitch(dst_dib));
++	if (UINT_MAX >= result) {
++		dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x * 3);
++	} else {
++		dst_bits = FreeImage_GetBits(dst_dib);
++	}
+ 	BYTE *src_bits = FreeImage_GetBits(src_dib);	
+ 
+ 	if(alpha > 255) {
+@@ -413,7 +443,13 @@ Combine32(FIBITMAP *dst_dib, FIBITMAP *src_dib, unsigned x, unsigned y, unsigned
+ 		return FALSE;
+ 	}
+ 
+-	BYTE *dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x * 4);
++	BYTE *dst_bits = nullptr;
++	long long result = ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) *	FreeImage_GetPitch(dst_dib));
++	if (UINT_MAX >= result) {
++		dst_bits = FreeImage_GetBits(dst_dib) + ((FreeImage_GetHeight(dst_dib) - FreeImage_GetHeight(src_dib) - y) * FreeImage_GetPitch(dst_dib)) + (x * 4);
++	} else {
++		dst_bits = FreeImage_GetBits(dst_dib);
++	}
+ 	BYTE *src_bits = FreeImage_GetBits(src_dib);	
+ 
+ 	if (alpha > 255) {
+@@ -463,7 +499,13 @@ CombineSameType(FIBITMAP *dst_dib, FIBITMAP *src_dib, unsigned x, unsigned y) {
+ 		return FALSE;
+ 	}	
+ 
+-	BYTE *dst_bits = FreeImage_GetBits(dst_dib) + ((dst_height - src_height - y) * dst_pitch) + (x * (src_line / src_width));
++	BYTE *dst_bits = nullptr;
++	long long result = (((dst_height - src_height - y) * dst_pitch));
++	if (UINT_MAX >= result) {
++		dst_bits = FreeImage_GetBits(dst_dib) + ((dst_height - src_height - y) * dst_pitch) + (x * (src_line / src_width));
++	} else {
++		dst_bits = FreeImage_GetBits(dst_dib);
++	}
+ 	BYTE *src_bits = FreeImage_GetBits(src_dib);	
+ 
+ 	// combine images	
+-- 
+2.20.1
+

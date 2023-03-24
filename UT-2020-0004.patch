@@ -1,0 +1,47 @@
+From 39290ae53f890d72a90e90db0b186718616cba2a Mon Sep 17 00:00:00 2001
+From: depend <523633637@qq.com>
+Date: Wed, 12 Aug 2020 17:13:38 +0800
+Subject: [PATCH] =?UTF-8?q?title=20PSD=E6=A0=BC=E5=BC=8F=E5=9B=BE=E7=89=87?=
+ =?UTF-8?q?=E5=AE=89=E5=85=A8=E6=B3=84=E9=9C=B2=E9=97=AE=E9=A2=98=E8=A7=A3?=
+ =?UTF-8?q?=E5=86=B3?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Description 源码中srcSize更改为signed类型
+
+Log: 与安全泄露问题相关
+---
+ Source/FreeImage/PSDParser.cpp | 2 +-
+ Source/FreeImage/PSDParser.h   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Source/FreeImage/PSDParser.cpp b/Source/FreeImage/PSDParser.cpp
+index 5865216..41edd97 100644
+--- a/Source/FreeImage/PSDParser.cpp
++++ b/Source/FreeImage/PSDParser.cpp
+@@ -1307,7 +1307,7 @@ void psdParser::ReadImageLine(BYTE* dst, const BYTE* src, unsigned lineSize, uns
+ 	}
+ }
+ 
+-void psdParser::UnpackRLE(BYTE* line, const BYTE* rle_line, BYTE* line_end, unsigned srcSize) {
++void psdParser::UnpackRLE(BYTE* line, const BYTE* rle_line, BYTE* line_end, signed srcSize) {
+ 	while (srcSize > 0) {
+ 
+ 		int len = *rle_line++;
+diff --git a/Source/FreeImage/PSDParser.h b/Source/FreeImage/PSDParser.h
+index 77aa626..bad637b 100644
+--- a/Source/FreeImage/PSDParser.h
++++ b/Source/FreeImage/PSDParser.h
+@@ -316,7 +316,7 @@ private:
+ 	/**	Actually ignore it */
+ 	bool ReadLayerAndMaskInfoSection(FreeImageIO *io, fi_handle handle);
+ 	void ReadImageLine(BYTE* dst, const BYTE* src, unsigned lineSize, unsigned dstBpp, unsigned bytes);
+-	void UnpackRLE(BYTE* dst, const BYTE* src, BYTE* dst_end, unsigned srcSize);
++	void UnpackRLE(BYTE* dst, const BYTE* src, BYTE* dst_end, signed srcSize);
+ 	FIBITMAP* ReadImageData(FreeImageIO *io, fi_handle handle);
+ 	bool WriteLayerAndMaskInfoSection(FreeImageIO *io, fi_handle handle);
+ 	void WriteImageLine(BYTE* dst, const BYTE* src, unsigned lineSize, unsigned srcBpp, unsigned bytes);
+-- 
+2.20.1
+

@@ -1,0 +1,36 @@
+From 6ba39d434cea36e6419a17c72b9a66e63a8ac08b Mon Sep 17 00:00:00 2001
+From: liuminghang <liuminghang@uniontech.com>
+Date: Wed, 23 Dec 2020 10:28:49 +0800
+Subject: [PATCH] UT-2020-0006
+
+Description:
+
+Log:
+Bug:
+Issue:
+Task:
+Change-Id: I6893be21385793aed2fe57566a934f4193588179
+---
+ Source/FreeImage/PSDParser.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/Source/FreeImage/PSDParser.cpp b/Source/FreeImage/PSDParser.cpp
+index 3397f2c..95f132b 100644
+--- a/Source/FreeImage/PSDParser.cpp
++++ b/Source/FreeImage/PSDParser.cpp
+@@ -798,7 +798,11 @@ int psdThumbnail::Read(FreeImageIO *io, fi_handle handle, int iResourceSize, boo
+ 		for(unsigned h = 0; h < (unsigned)_Height; ++h, dst_line_start -= dstLineSize) {//<*** flipped
+ 			io->read_proc(line_start, _WidthBytes, 1, handle);
+ 			iTotalData -= _WidthBytes;
+-			memcpy(dst_line_start, line_start, _Width * _BitPerPixel / 8);
++			unsigned iBuffer=_Width * _BitPerPixel / 8;
++			if(iBuffer>_WidthBytes){
++				iBuffer=_WidthBytes;
++			}
++			memcpy(dst_line_start, line_start, iBuffer);
+ 		}
+ #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR
+ 		SwapRedBlue32(_dib);
+-- 
+2.20.1
+

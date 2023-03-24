@@ -1,0 +1,42 @@
+package:
+  id: freeimage
+  version: 3.18.0
+  kind: lib
+
+base:
+  id: org.deepin.base
+  version: 20.5.0
+
+source:
+  kind: git
+  url: https://github.com/deepin-community/freeimage.git
+  version: master
+  commit: 8f8d649e5857425ad4616356ca93d7006ba0cd9e
+  patch:
+  - Disable-vendored-dependencies.patch
+  - Use-system-dependencies.patch
+  - Fix-macro-redefinition-for-64-bit-integer-types.patch
+  - Fix-compatibility-with-system-libpng.patch
+  - Disable-usage-of-HTML-timestamps-in-doxygen.patch
+  - Disable-testing-of-JPEG-transform.patch
+  - Disable-testing-of-JXR-MemIO.patch
+  - Fix-encoding-of-fi-header.patch
+  - Enable-substitution-of-pkg-config.patch
+  - CVE-2019-12211-13.patch
+  - Fix_compilation_external-static.patch
+  - Fix-libraw-compilation.patch
+  - UT-2020-0004.patch
+  - UT-2020-0005.patch
+  - UT-2020-0006.patch
+  - UT-2020-0007.patch
+  - UT-2020-0017.patch
+  - UT-2020-0016_0018.patch
+  - UT-2021-0001.patch
+build:
+  kind: manual
+  manual:
+    configure: |
+      sh gensrclist.sh && sh genfipsrclist.sh
+      make clean && make -f Makefile.fip clean 
+      make -j && make -f Makefile.fip -j
+      make -j install && make -f Makefile.fip -j install

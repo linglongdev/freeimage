@@ -1,0 +1,34 @@
+From dfb45334ae2b3609855c6662844849f0c11b4b0d Mon Sep 17 00:00:00 2001
+From: liuminghang <liuminghang@uniontech.com>
+Date: Wed, 23 Dec 2020 14:11:45 +0800
+Subject: [PATCH] UT-2020-0017
+
+Description:
+
+Log:
+Bug:
+Issue:
+Task:
+Change-Id: I6562bd57fd5b6594d72ac0fa957dfa5e3e11a9ff
+---
+ Source/FreeImage/PluginPNM.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/Source/FreeImage/PluginPNM.cpp b/Source/FreeImage/PluginPNM.cpp
+index 3b4d0de..696a7c6 100644
+--- a/Source/FreeImage/PluginPNM.cpp
++++ b/Source/FreeImage/PluginPNM.cpp
+@@ -244,6 +244,10 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
+ 
+ 		int width  = GetInt(io, handle);
+ 		int height = GetInt(io, handle);
++		//width pr height may be negative
++		if(width < 0 ||height < 0){
++			return NULL;
++		}
+ 		int maxval = 1;
+ 
+ 		if((id_two == '2') || (id_two == '5') || (id_two == '3') || (id_two == '6')) {
+-- 
+2.20.1
+
